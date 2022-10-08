@@ -51,7 +51,7 @@ class Navbar extends React.Component<Props, State> {
                     <BootstrapNavbar.Collapse className="justify-content-center">
 
                         <Nav>
-                            <Form className="d-flex">
+                            <Form className="d-flex" onSubmit={this.onSubmit}>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="outline-primary" style={{ marginRight: "20px" }}>
                                         Filtrar por: {filterType}
@@ -72,7 +72,7 @@ class Navbar extends React.Component<Props, State> {
                                     ref={this.txtSearchRef}
                                 />
 
-                                <Button variant="outline-primary" type="button" onClick={this.onClickBtnSearch}>
+                                <Button variant="outline-primary" type="submit">
                                     <i className="fa-solid fa-magnifying-glass"></i>
                                 </Button>
                             </Form>
@@ -88,7 +88,9 @@ class Navbar extends React.Component<Props, State> {
         this.addEventListeners();
     }
 
-    private onClickBtnSearch = (): void => {
+    private onSubmit = (evt: React.FormEvent<HTMLFormElement>): void => {
+        evt.preventDefault();
+
         const { filterType, searchText } = this.state;
 
         const url = new URL(window.location.origin);

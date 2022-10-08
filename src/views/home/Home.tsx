@@ -5,6 +5,7 @@ import Axios from "axios";
 
 import Components from "../../components/Components";
 import Contracts from "../../contracts/Contracts";
+import FilterPersons from "../../helpers/FilterPersons";
 
 import "./home.scss";
 
@@ -60,10 +61,8 @@ class Home extends React.Component<React.PropsWithChildren, State> {
     private loadPersonsData = async (): Promise<void> => {
         try {
             const response = await Axios.get<Contracts.Person[]>("https://jsonplaceholder.typicode.com/users");
-            const personsFiltered = response.data.sort((a, b) => a.name.localeCompare(b.name))
-                .filter((person, index) => index < 5 ? person : null)
 
-            this.setState({ persons: response.data, personsFiltered });
+            this.setState({ persons: response.data, personsFiltered: FilterPersons.filter(response.data) });
         } catch (error) {
             console.error(error);
             this.setState({ errorOnLoadingPersons: true });
@@ -71,37 +70,9 @@ class Home extends React.Component<React.PropsWithChildren, State> {
     }
 
     private filterPersons = (): void => {
-        const { searchParams } = new URL(window.location.href);
-
-        if (searchParams.get("name")?.trim()?.length)
-            this.setState({ personsFiltered: this.filterPersonsByName(searchParams.get("name")?.trim() ?? "") });
-
-        else if (searchParams.get("city")?.trim()?.length)
-            this.setState({ personsFiltered: this.filterPersonsByCity(searchParams.get("city")?.trim() ?? "") });
-
-        else
-            this.setState({ personsFiltered: this.filterPersonsDefault() });
-    }
-
-    private filterPersonsByName = (name: string): Contracts.Person[] => {
         const { persons } = this.state;
 
-        return persons.filter((person) => person.name.toLowerCase().match(name.toLowerCase()))
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    private filterPersonsByCity = (city: string): Contracts.Person[] => {
-        const { persons } = this.state;
-
-        return persons.filter((person) => person.address.city.toLowerCase().match(city.toLowerCase()))
-            .sort((a, b) => a.address.city.localeCompare(b.address.city));
-    }
-
-    private filterPersonsDefault = (): Contracts.Person[] => {
-        const { persons } = this.state;
-
-        return persons.sort((a, b) => a.name.localeCompare(b.name))
-            .filter((person, index) => index < 5 ? person : null);
+        this.setState({ personsFiltered: FilterPersons.filter(persons) });
     }
 }
 
