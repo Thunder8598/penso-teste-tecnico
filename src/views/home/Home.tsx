@@ -4,12 +4,12 @@ import Axios from "axios";
 
 import Components from "../../components/Components";
 import Contracts from "../../contracts/Contracts";
-import Layout from "../Layout";
 
 import "./home.scss";
 
 interface State {
-    persons: Contracts.Person[]
+    persons: Contracts.Person[],
+    personsFiltered: Contracts.Person[]
 }
 
 class Home extends React.Component<React.PropsWithChildren, State> {
@@ -17,38 +17,72 @@ class Home extends React.Component<React.PropsWithChildren, State> {
         super(props);
 
         this.state = {
-            persons: []
+            persons: [],
+            personsFiltered: []
         };
     }
 
     render(): React.ReactNode {
-        const { persons } = this.state;
+        const { personsFiltered } = this.state;
 
         return (
-            <Layout>
+            <>
+                <Components.Navbar filterPersons={this.filterPersons} />
 
                 <main id="home">
                     <Container>
-                        <Components.Listing persons={persons} />
+                        <Components.Listing persons={personsFiltered} />
                     </Container>
                 </main>
-
-            </Layout>
+            </>
         );
     }
 
-    componentDidMount(): void {
-        this.loadPersonsData();
+    async componentDidMount(): Promise<void> {
+        await this.loadPersonsData();
+        this.filterPersons();
     }
 
     private loadPersonsData = async (): Promise<void> => {
         try {
             const response = await Axios.get<Contracts.Person[]>("https://jsonplaceholder.typicode.com/users");
 
-            this.setState({ persons: response.data });
+            this.setState({ persons: response.data, personsFiltered: response.data });
         } catch (error) {
             console.error(error);
         }
+    }
+
+    private filterPersons = (): void => {
+        const { searchParams } = new URL(window.location.href);
+
+        if (searchParams.get("name")?.trim()?.length)
+            this.setState({ personsFiltered: this.filterPersonsByName(searchParams.get("name")?.trim() ?? "") });
+
+        else if (searchParams.get("city")?.trim()?.length)
+            this.setState({ personsFiltered: this.filterPersonsByCity(searchParams.get("city")?.trim() ?? "") });
+
+        else
+            this.setState({ personsFiltered: this.filterPersonsDefault() });
+    }
+
+    private filterPersonsByName = (name: string): Contracts.Person[] => {
+        const { persons } = this.state;
+
+        return persons.filter((person) => person.name.toLowerCase().match(name.toLowerCase()));
+    }
+
+    private filterPersonsByCity = (city: string): Contracts.Person[] => {
+        const { persons } = this.state;
+
+        return persons.filter((person) => person.address.city.toLowerCase().match(city.toLowerCase()));
+    }
+
+    private filterPersonsDefault = (): Contracts.Person[] => {
+        const { persons } = this.state;
+
+        return persons.sort((a, b) => a.name.localeCompare(b.name))
+            .filter((person, index) => index < 5 ? person : null);
     }
 }
 

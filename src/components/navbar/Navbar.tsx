@@ -12,13 +12,17 @@ enum FilterType {
     CITY = "Cidade"
 }
 
+interface Props {
+    filterPersons: () => void
+}
+
 interface State {
     searchText: string,
     filterType: FilterType
 }
 
-class Navbar extends React.Component<React.PropsWithChildren, State> {
-    constructor(props: React.PropsWithChildren) {
+class Navbar extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -61,7 +65,7 @@ class Navbar extends React.Component<React.PropsWithChildren, State> {
                                     className="me-2"
                                 />
 
-                                <Button variant="outline-primary" onClick={this.onClickBtnSearch}>Buscar</Button>
+                                <Button variant="outline-primary" type="button" onClick={this.onClickBtnSearch}>Buscar</Button>
                             </Form>
                         </Nav>
 
@@ -73,11 +77,13 @@ class Navbar extends React.Component<React.PropsWithChildren, State> {
 
     private onClickBtnSearch = (): void => {
         const { filterType, searchText } = this.state;
+
         const url = new URL(window.location.origin);
         const queryParamName = filterType == FilterType.NAME ? "name" : "city";
 
         url.searchParams.set(queryParamName, searchText);
         window.history.pushState(null, "", url);
+        this.props.filterPersons();
     }
 }
 
