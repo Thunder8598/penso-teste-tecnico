@@ -38,16 +38,17 @@ class Home extends React.Component<React.PropsWithChildren, State> {
         );
     }
 
-    async componentDidMount(): Promise<void> {
-        await this.loadPersonsData();
-        this.filterPersons();
+    componentDidMount(): void {
+        this.loadPersonsData();
     }
 
     private loadPersonsData = async (): Promise<void> => {
         try {
             const response = await Axios.get<Contracts.Person[]>("https://jsonplaceholder.typicode.com/users");
+            const personsFiltered = response.data.sort((a, b) => a.name.localeCompare(b.name))
+                .filter((person, index) => index < 5 ? person : null)
 
-            this.setState({ persons: response.data, personsFiltered: response.data });
+            this.setState({ persons: response.data, personsFiltered });
         } catch (error) {
             console.error(error);
         }
