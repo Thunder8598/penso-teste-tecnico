@@ -24,6 +24,8 @@ interface State {
 }
 
 class Navbar extends React.Component<Props, State> {
+    private txtSearchRef: React.RefObject<HTMLInputElement>;
+
     constructor(props: Props) {
         super(props);
 
@@ -31,6 +33,8 @@ class Navbar extends React.Component<Props, State> {
             searchText: "",
             filterType: FilterType.NAME
         };
+
+        this.txtSearchRef = React.createRef();
     }
 
     render(): React.ReactNode {
@@ -65,6 +69,7 @@ class Navbar extends React.Component<Props, State> {
                                     type="search"
                                     placeholder={`Filtrar por ${filterType}`}
                                     className="me-2"
+                                    ref={this.txtSearchRef}
                                 />
 
                                 <Button variant="outline-primary" type="button" onClick={this.onClickBtnSearch}>
@@ -79,6 +84,10 @@ class Navbar extends React.Component<Props, State> {
         );
     }
 
+    componentDidMount(): void {
+        this.addEventListeners();
+    }
+
     private onClickBtnSearch = (): void => {
         const { filterType, searchText } = this.state;
 
@@ -88,6 +97,17 @@ class Navbar extends React.Component<Props, State> {
         url.searchParams.set(queryParamName, searchText);
         window.history.pushState(null, "", url);
         this.props.filterPersons();
+    }
+
+    private addEventListeners = (): void => {
+        this.txtSearchRef.current?.addEventListener("search", () => {
+            const { searchText } = this.state;
+
+            if (!searchText.trim().length) {
+                window.history.pushState(null, "", window.location.origin);
+                this.props.filterPersons();
+            }
+        });
     }
 }
 
