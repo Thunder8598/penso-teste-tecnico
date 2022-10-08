@@ -7,6 +7,8 @@ import Form from "react-bootstrap/Form";
 import Dropdown from "react-bootstrap/Dropdown";
 import NavLink from "react-bootstrap/NavLink";
 
+import "./navbar.scss";
+
 enum FilterType {
     NAME = "Nome",
     CITY = "Cidade"
@@ -65,7 +67,9 @@ class Navbar extends React.Component<Props, State> {
                                     className="me-2"
                                 />
 
-                                <Button variant="outline-primary" type="button" onClick={this.onClickBtnSearch}>Buscar</Button>
+                                <Button variant="outline-primary" type="button" onClick={this.onClickBtnSearch}>
+                                    <i className="fa-solid fa-magnifying-glass"></i>
+                                </Button>
                             </Form>
                         </Nav>
 
