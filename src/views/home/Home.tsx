@@ -1,5 +1,6 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
+import Alert from "react-bootstrap/Alert";
 import Axios from "axios";
 
 import Components from "../../components/Components";
@@ -9,7 +10,8 @@ import "./home.scss";
 
 interface State {
     persons: Contracts.Person[],
-    personsFiltered: Contracts.Person[]
+    personsFiltered: Contracts.Person[],
+    errorOnLoadingPersons: boolean
 }
 
 class Home extends React.Component<React.PropsWithChildren, State> {
@@ -18,12 +20,13 @@ class Home extends React.Component<React.PropsWithChildren, State> {
 
         this.state = {
             persons: [],
-            personsFiltered: []
+            personsFiltered: [],
+            errorOnLoadingPersons: false
         };
     }
 
     render(): React.ReactNode {
-        const { personsFiltered } = this.state;
+        const { persons, personsFiltered, errorOnLoadingPersons } = this.state;
 
         return (
             <>
@@ -31,7 +34,19 @@ class Home extends React.Component<React.PropsWithChildren, State> {
 
                 <main id="home">
                     <Container>
-                        <Components.Listing persons={personsFiltered} />
+                        {
+                            errorOnLoadingPersons ?
+                                (
+                                    <Alert variant="danger">
+                                        Não foi possivel carregar os dados. Por favor tente novamente mais tarde.
+                                    </Alert>
+                                ) : <></>
+                        }
+
+                        {
+                            persons.length ?
+                                <Components.Listing persons={personsFiltered} /> : <></>
+                        }
                     </Container>
                 </main>
             </>
@@ -51,6 +66,7 @@ class Home extends React.Component<React.PropsWithChildren, State> {
             this.setState({ persons: response.data, personsFiltered });
         } catch (error) {
             console.error(error);
+            this.setState({ errorOnLoadingPersons: true });
         }
     }
 
