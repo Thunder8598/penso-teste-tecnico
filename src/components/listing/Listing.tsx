@@ -17,9 +17,9 @@ class Listing extends React.Component<Props>{
         return (
             <section className="listing">
                 {
-                    persons.map(({ name, email, address }) => {
+                    persons.map(({ name, email, address, id }) => {
                         return (
-                            <Card>
+                            <Card key={id}>
                                 <Card.Body>
                                     <Card.Title>{name}</Card.Title>
                                     <Card.Subtitle className="mb-2 text-muted">{address.city}</Card.Subtitle>
