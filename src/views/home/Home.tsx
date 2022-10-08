@@ -69,13 +69,15 @@ class Home extends React.Component<React.PropsWithChildren, State> {
     private filterPersonsByName = (name: string): Contracts.Person[] => {
         const { persons } = this.state;
 
-        return persons.filter((person) => person.name.toLowerCase().match(name.toLowerCase()));
+        return persons.filter((person) => person.name.toLowerCase().match(name.toLowerCase()))
+            .sort((a, b) => a.name.localeCompare(b.name));
     }
 
     private filterPersonsByCity = (city: string): Contracts.Person[] => {
         const { persons } = this.state;
 
-        return persons.filter((person) => person.address.city.toLowerCase().match(city.toLowerCase()));
+        return persons.filter((person) => person.address.city.toLowerCase().match(city.toLowerCase()))
+            .sort((a, b) => a.address.city.localeCompare(b.address.city));
     }
 
     private filterPersonsDefault = (): Contracts.Person[] => {
