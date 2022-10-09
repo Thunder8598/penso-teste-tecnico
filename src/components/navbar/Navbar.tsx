@@ -86,6 +86,7 @@ class Navbar extends React.Component<Props, State> {
 
     componentDidMount(): void {
         this.addEventListeners();
+        this.setSearchTextByUrlQuery();
     }
 
     private onSubmit = (evt: React.FormEvent<HTMLFormElement>): void => {
@@ -110,6 +111,16 @@ class Navbar extends React.Component<Props, State> {
                 this.props.filterPersons();
             }
         });
+    }
+
+    private setSearchTextByUrlQuery = (): void => {
+        const { searchParams } = new URL(window.location.href);
+
+        if (searchParams.get("name")?.trim()?.length)
+            this.setState({ searchText: searchParams.get("name")?.trim() ?? "", filterType: FilterType.NAME });
+
+        else if (searchParams.get("city")?.trim()?.length)
+            this.setState({ searchText: searchParams.get("city")?.trim() ?? "", filterType: FilterType.CITY });
     }
 }
 
